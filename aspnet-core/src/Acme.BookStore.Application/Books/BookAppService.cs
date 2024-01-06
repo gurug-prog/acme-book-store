@@ -5,11 +5,13 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Acme.BookStore.Authors;
 using Acme.BookStore.Permissions;
+using Acme.BookStore.Publishers;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.ObjectMapping;
 
 namespace Acme.BookStore.Books;
 
@@ -24,13 +26,16 @@ public class BookAppService :
     IBookAppService //implement the IBookAppService
 {
     private readonly IAuthorRepository _authorRepository;
+    private readonly IPublisherRepository _publisherRepository;
 
     public BookAppService(
         IRepository<Book, Guid> repository,
-        IAuthorRepository authorRepository)
+        IAuthorRepository authorRepository,
+        IPublisherRepository publisherRepository)
         : base(repository)
     {
         _authorRepository = authorRepository;
+        this._publisherRepository = publisherRepository;
         GetPolicyName = BookStorePermissions.Books.Default;
         GetListPolicyName = BookStorePermissions.Books.Default;
         CreatePolicyName = BookStorePermissions.Books.Create;
@@ -46,8 +51,9 @@ public class BookAppService :
         //Prepare a query to join books and authors
         var query = from book in queryable
                     join author in await _authorRepository.GetQueryableAsync() on book.AuthorId equals author.Id
+                    join publisher in await _publisherRepository.GetQueryableAsync() on book.PublisherId equals publisher.Id
                     where book.Id == id
-                    select new { book, author };
+                    select new { book, author, publisher };
 
         //Execute the query and get the book with author
         var queryResult = await AsyncExecuter.FirstOrDefaultAsync(query);
@@ -58,6 +64,7 @@ public class BookAppService :
 
         var bookDto = ObjectMapper.Map<Book, BookDto>(queryResult.book);
         bookDto.AuthorName = queryResult.author.Name;
+        bookDto.PublisherName = queryResult.publisher.Name;
         return bookDto;
     }
 
@@ -69,7 +76,8 @@ public class BookAppService :
         //Prepare a query to join books and authors
         var query = from book in queryable
                     join author in await _authorRepository.GetQueryableAsync() on book.AuthorId equals author.Id
-                    select new { book, author };
+                    join publisher in await _publisherRepository.GetQueryableAsync() on book.PublisherId equals publisher.Id
+                    select new { book, author, publisher };
 
         //Paging
         query = query
@@ -85,6 +93,7 @@ public class BookAppService :
         {
             var bookDto = ObjectMapper.Map<Book, BookDto>(x.book);
             bookDto.AuthorName = x.author.Name;
+            bookDto.PublisherName = x.publisher.Name;
             return bookDto;
         }).ToList();
 
@@ -106,6 +115,15 @@ public class BookAppService :
         );
     }
 
+    public async Task<ListResultDto<PublisherLookupDto>> GetPublisherLookupAsync()
+    {
+        var publishers = await _publisherRepository.GetListAsync();
+
+        return new ListResultDto<PublisherLookupDto>(
+            ObjectMapper.Map<List<Publisher>, List<PublisherLookupDto>>(publishers)
+        );
+    }
+
     private static string NormalizeSorting(string sorting)
     {
         if (sorting.IsNullOrEmpty())
@@ -118,6 +136,15 @@ public class BookAppService :
             return sorting.Replace(
                 "authorName",
                 "author.Name",
+                StringComparison.OrdinalIgnoreCase
+            );
+        }
+
+        if (sorting.Contains("publisherName", StringComparison.OrdinalIgnoreCase))
+        {
+            return sorting.Replace(
+                "publisherName",
+                "publisher.Name",
                 StringComparison.OrdinalIgnoreCase
             );
         }

@@ -1,5 +1,6 @@
 ﻿using Acme.BookStore.Authors;
 using Acme.BookStore.Books;
+using Acme.BookStore.Publishers;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -26,7 +27,9 @@ public class BookStoreDbContext :
     IIdentityDbContext,
     ITenantManagementDbContext
 {
-    /* Add DbSet properties for your Aggregate Roots / Entities here. */
+    public DbSet<Book> Books { get; set; }
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<Publisher> Publishers { get; set; }
 
     #region Entities from the modules
 
@@ -42,8 +45,6 @@ public class BookStoreDbContext :
      */
 
     //Identity
-    public DbSet<Book> Books { get; set; }
-    public DbSet<Author> Authors { get; set; }
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
     public DbSet<IdentityClaimType> ClaimTypes { get; set; }
@@ -95,6 +96,21 @@ public class BookStoreDbContext :
         builder.Entity<Author>(b =>
         {
             b.ToTable(BookStoreConsts.DbTablePrefix + "Authors",
+                BookStoreConsts.DbSchema);
+
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Name)
+                .IsRequired()
+                .HasMaxLength(AuthorConsts.MaxNameLength);
+
+            b.HasIndex(x => x.Name);
+        });
+
+
+        builder.Entity<Publisher>(b =>
+        {
+            b.ToTable(BookStoreConsts.DbTablePrefix + "Publishers",
                 BookStoreConsts.DbSchema);
 
             b.ConfigureByConvention();

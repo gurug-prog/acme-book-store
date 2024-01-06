@@ -37,10 +37,20 @@
     "Permission:Authors.Create": "Creating new authors",
     "Permission:Authors.Edit": "Editing the authors",
     "Permission:Authors.Delete": "Deleting the authors",
+    "Permission:Publisher": "Publisher Management",
+    "Permission:Publisher.Create": "Creating new publishers",
+    "Permission:Publisher.Edit": "Editing the publishers",
+    "Permission:Publisher.Delete": "Deleting the publishers",
     "Menu:Authors": "Authors",
     "Authors": "Authors",
     "AuthorDeletionConfirmationMessage": "Are you sure to delete the author '{0}'?",
     "BirthDate": "Birth date",
-    "NewAuthor": "New author"
+    "NewAuthor": "New author",
+    "Menu:Publishers": "Publishers",
+    "Publishers": "Publishers",
+    "PublisherDeletionConfirmationMessage": "Are you sure to delete the publisher '{0}'?",
+    "Address": "Address",
+    "ContactPhone": "Contact Phone",
+    "NewPublisher": "New publisher"
   }
 }

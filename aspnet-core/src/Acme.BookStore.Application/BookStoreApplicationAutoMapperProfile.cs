@@ -1,5 +1,6 @@
 ﻿using Acme.BookStore.Authors;
 using Acme.BookStore.Books;
+using Acme.BookStore.Publishers;
 using AutoMapper;
 
 namespace Acme.BookStore;
@@ -10,7 +11,11 @@ public class BookStoreApplicationAutoMapperProfile : Profile
     {
         CreateMap<Book, BookDto>();
         CreateMap<CreateUpdateBookDto, Book>();
+
         CreateMap<Author, AuthorDto>();
         CreateMap<Author, AuthorLookupDto>();
+
+        CreateMap<Publisher, PublisherLookupDto>();
+        CreateMap<Publisher, PublisherDto>();
     }
 }

@@ -16,4 +16,8 @@ public class BookDto : AuditedEntityDto<Guid>
     public Guid AuthorId { get; set; }
 
     public string AuthorName { get; set; }
+
+    public Guid PublisherId { get; set; }
+
+    public string PublisherName { get; set; }
 }

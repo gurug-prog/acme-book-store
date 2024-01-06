@@ -1,6 +1,6 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
-import { BookService, BookDto, bookTypeOptions, AuthorLookupDto } from '@proxy/books';
+import { BookService, BookDto, bookTypeOptions, AuthorLookupDto, PublisherLookupDto } from '@proxy/books';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
@@ -21,6 +21,7 @@ export class BookComponent implements OnInit {
   selectedBook = {} as BookDto;
 
   authors$: Observable<AuthorLookupDto[]>;
+  publishers$: Observable<PublisherLookupDto[]>;
 
   bookTypes = bookTypeOptions;
 
@@ -33,6 +34,7 @@ export class BookComponent implements OnInit {
     private confirmation: ConfirmationService
   ) {
     this.authors$ = bookService.getAuthorLookup().pipe(map((r) => r.items));
+    this.publishers$ = bookService.getPublisherLookup().pipe(map((r) => r.items));
   }
 
   ngOnInit() {

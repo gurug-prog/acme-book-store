@@ -20,4 +20,6 @@ public class CreateUpdateBookDto
     public float Price { get; set; }
 
     public Guid AuthorId { get; set; }
+
+    public Guid PublisherId { get; set; }
 }
