@@ -1,0 +1,48 @@
+version: '3.4'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    volumes:
+      - sqldbdata:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=1
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes: 
+      - nosqldbdata:/data/db
+
+  dbmigrator:
+    build:
+      context: ./
+      dockerfile: aspnet-core/src/Acme.BookStore.DbMigrator/Dockerfile
+    ports:
+      - "1433:1433"
+      - "1434:1434"
+    depends_on:
+      - mssql
+
+  book-store:
+    build:
+      context: ./
+      dockerfile: aspnet-core/src/Acme.BookStore.HttpApi.Host/Dockerfile
+    ports:
+      - "44369:44369"
+    depends_on:
+      - mssql
+      - mongodb
+      - dbmigrator
+
+  angular:
+    build:
+      context: ./
+      dockerfile: angular/Dockerfile
+    ports:
+      - "4200:4200"
+
+volumes:
+  sqldbdata:
+  nosqldbdata:
