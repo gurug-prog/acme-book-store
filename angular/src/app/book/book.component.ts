@@ -1,11 +1,18 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
-import { BookService, BookDto, bookTypeOptions, AuthorLookupDto, PublisherLookupDto } from '@proxy/books';
+import {
+  BookService,
+  BookDto,
+  bookTypeOptions,
+  AuthorLookupDto,
+  PublisherLookupDto,
+} from '@proxy/books';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { FileServiceService } from '../shared/file-service.service';
 
 @Component({
   selector: 'app-book',
@@ -26,23 +33,30 @@ export class BookComponent implements OnInit {
   bookTypes = bookTypeOptions;
 
   isModalOpen = false;
+  coverImage: string;
 
   constructor(
     public readonly list: ListService,
     private bookService: BookService,
     private fb: FormBuilder,
-    private confirmation: ConfirmationService
+    private confirmation: ConfirmationService,
+    private fileService: FileServiceService
   ) {
-    this.authors$ = bookService.getAuthorLookup().pipe(map((r) => r.items));
-    this.publishers$ = bookService.getPublisherLookup().pipe(map((r) => r.items));
+    this.authors$ = bookService.getAuthorLookup().pipe(map(r => r.items));
+    this.publishers$ = bookService.getPublisherLookup().pipe(map(r => r.items));
   }
 
   ngOnInit() {
-    const bookStreamCreator = (query) => this.bookService.getList(query);
+    const bookStreamCreator = query => this.bookService.getList(query);
 
-    this.list.hookToQuery(bookStreamCreator).subscribe((response) => {
+    this.list.hookToQuery(bookStreamCreator).subscribe(response => {
       this.book = response;
     });
+  }
+
+  async onCoverChange(event) {
+    const file = event.target.files[0];
+    this.coverImage = await this.fileService.fileToDataUrl(file);
   }
 
   createBook() {
@@ -52,8 +66,12 @@ export class BookComponent implements OnInit {
   }
 
   editBook(id: string) {
-    this.bookService.get(id).subscribe((book) => {
+    this.bookService.get(id).subscribe(async book => {
       this.selectedBook = book;
+      this.coverImage = await this.fileService.base64ToDataURL(
+        'application/image',
+        book.coverImage
+      );
       this.buildForm();
       this.isModalOpen = true;
     });
@@ -78,9 +96,17 @@ export class BookComponent implements OnInit {
       return;
     }
 
+    const data = {
+      ...this.form.value,
+    };
+
+    if (this.coverImage?.length) {
+      data.coverImage = this.fileService.dataUrlToBase64(this.coverImage);
+    }
+
     const request = this.selectedBook.id
-      ? this.bookService.update(this.selectedBook.id, this.form.value)
-      : this.bookService.create(this.form.value);
+      ? this.bookService.update(this.selectedBook.id, data)
+      : this.bookService.create(data);
 
     request.subscribe(() => {
       this.isModalOpen = false;
@@ -90,7 +116,7 @@ export class BookComponent implements OnInit {
   }
 
   delete(id: string) {
-    this.confirmation.warn('::AreYouSureToDelete', 'AbpAccount::AreYouSure').subscribe((status) => {
+    this.confirmation.warn('::AreYouSureToDelete', 'AbpAccount::AreYouSure').subscribe(status => {
       if (status === Confirmation.Status.confirm) {
         this.bookService.delete(id).subscribe(() => this.list.get());
       }

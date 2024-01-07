@@ -118,6 +118,14 @@
         <input #datepicker="ngbDatepicker" class="form-control" name="datepicker" formControlName="publishDate"
           ngbDatepicker (click)="datepicker.toggle()" />
       </div>
+
+      <div class="mt-2">
+        <label>Cover Image</label><span> * </span>
+        <input type="file" id="cover-image" class="form-control" accept=".jpd,.png,.gif" (change)="onCoverChange($event)" />
+        <div class="flex w-100 text-center my-3">
+          <img *ngIf="coverImage" style="width: 50%;" [src]="coverImage" />
+        </div>
+      </div>
     </form>
   </ng-template>
 

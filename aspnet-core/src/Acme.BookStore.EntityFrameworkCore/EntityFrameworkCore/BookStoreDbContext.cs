@@ -1,4 +1,4 @@
-﻿using Acme.BookStore.Authors;
+using Acme.BookStore.Authors;
 using Acme.BookStore.Books;
 using Acme.BookStore.Publishers;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +16,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 
 namespace Acme.BookStore.EntityFrameworkCore;
 
@@ -121,5 +122,6 @@ public class BookStoreDbContext :
 
             b.HasIndex(x => x.Name);
         });
-    }
+        builder.ConfigureBlobStoring();
+        }
 }

@@ -4,14 +4,17 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Acme.BookStore.Authors;
+using Acme.BookStore.Data;
 using Acme.BookStore.Permissions;
 using Acme.BookStore.Publishers;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.BlobStoring;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Acme.BookStore.Books;
 
@@ -27,20 +30,39 @@ public class BookAppService :
 {
     private readonly IAuthorRepository _authorRepository;
     private readonly IPublisherRepository _publisherRepository;
+    private readonly IBlobContainer<BookFileContainer> _blobContainer;
 
     public BookAppService(
         IRepository<Book, Guid> repository,
         IAuthorRepository authorRepository,
-        IPublisherRepository publisherRepository)
+        IPublisherRepository publisherRepository,
+        IBlobContainer<BookFileContainer> blobContainer)
         : base(repository)
     {
         _authorRepository = authorRepository;
         this._publisherRepository = publisherRepository;
+        this._blobContainer = blobContainer;
         GetPolicyName = BookStorePermissions.Books.Default;
         GetListPolicyName = BookStorePermissions.Books.Default;
         CreatePolicyName = BookStorePermissions.Books.Create;
         UpdatePolicyName = BookStorePermissions.Books.Edit;
         DeletePolicyName = BookStorePermissions.Books.Delete;
+    }
+
+    public override async Task<BookDto> CreateAsync(CreateUpdateBookDto input)
+    {
+        var created = await base.CreateAsync(input);
+        byte[] image = Convert.FromBase64String(input.CoverImage);
+        await _blobContainer.SaveAsync(created.Id.ToString(), image, true);
+        return created;
+    }
+
+    public override async Task<BookDto> UpdateAsync(Guid id, CreateUpdateBookDto input)
+    {
+        var updated = await base.UpdateAsync(id, input);
+        byte[] image = Convert.FromBase64String(input.CoverImage);
+        await _blobContainer.SaveAsync(updated.Id.ToString(), image, true);
+        return updated;
     }
 
     public override async Task<BookDto> GetAsync(Guid id)
@@ -65,6 +87,17 @@ public class BookAppService :
         var bookDto = ObjectMapper.Map<Book, BookDto>(queryResult.book);
         bookDto.AuthorName = queryResult.author.Name;
         bookDto.PublisherName = queryResult.publisher.Name;
+
+        try
+        {
+            var image = await _blobContainer.GetAllBytesAsync(id.ToString());
+            if (image != null)
+            {
+                bookDto.CoverImage = Convert.ToBase64String(image);
+            }
+        }
+        catch (Exception ex) { }
+
         return bookDto;
     }
 

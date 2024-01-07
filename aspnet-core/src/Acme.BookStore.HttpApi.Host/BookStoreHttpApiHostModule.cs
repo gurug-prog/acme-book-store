@@ -29,6 +29,9 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Acme.BookStore.MongoDb;
+using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.Database;
+using Acme.BookStore.Data;
 
 namespace Acme.BookStore;
 
@@ -71,6 +74,19 @@ public class BookStoreHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+
+        Configure<AbpBlobStoringOptions>(options =>
+        {
+            options.Containers.ConfigureDefault(container =>
+            {
+                container.UseDatabase();
+            });
+
+            options.Containers.Configure<BookFileContainer>(container =>
+            {
+                container.UseDatabase();
+            });
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

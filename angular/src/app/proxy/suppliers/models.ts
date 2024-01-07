@@ -3,7 +3,8 @@ import type { AuditedEntityDto, PagedAndSortedResultRequestDto } from '@abp/ng.c
 export interface CreateSupplierDto {
   name: string;
   address?: string;
-  contactPhone?: string;
+  contactInformation?: string;
+  minimumOrderQuantity: number;
 }
 
 export interface GetSupplierListDto extends PagedAndSortedResultRequestDto {

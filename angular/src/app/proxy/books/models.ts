@@ -14,6 +14,7 @@ export interface BookDto extends AuditedEntityDto<string> {
   authorName?: string;
   publisherId?: string;
   publisherName?: string;
+  coverImage?: string;
 }
 
 export interface CreateUpdateBookDto {
@@ -23,6 +24,7 @@ export interface CreateUpdateBookDto {
   price: number;
   authorId?: string;
   publisherId?: string;
+  coverImage?: string;
 }
 
 export interface PublisherLookupDto extends EntityDto<string> {

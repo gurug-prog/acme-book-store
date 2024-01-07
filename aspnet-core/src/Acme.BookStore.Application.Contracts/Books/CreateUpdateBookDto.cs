@@ -22,4 +22,6 @@ public class CreateUpdateBookDto
     public Guid AuthorId { get; set; }
 
     public Guid PublisherId { get; set; }
+
+    public string CoverImage { get; set; }
 }
