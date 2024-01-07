@@ -28,6 +28,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Acme.BookStore.MongoDb;
 
 namespace Acme.BookStore;
 
@@ -37,6 +38,7 @@ namespace Acme.BookStore;
     typeof(AbpAspNetCoreMultiTenancyModule),
     typeof(BookStoreApplicationModule),
     typeof(BookStoreEntityFrameworkCoreModule),
+    typeof(BookStoreMongoDbModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),

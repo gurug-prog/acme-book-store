@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Acme.BookStore.Application\Acme.BookStore.Application.csproj" />
     <ProjectReference Include="..\Acme.BookStore.EntityFrameworkCore\Acme.BookStore.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Acme.BookStore.HttpApi\Acme.BookStore.HttpApi.csproj" />
+    <ProjectReference Include="..\Acme.BookStore.MongoDb\Acme.BookStore.MongoDb.csproj" />
   </ItemGroup>
 
   <ItemGroup>

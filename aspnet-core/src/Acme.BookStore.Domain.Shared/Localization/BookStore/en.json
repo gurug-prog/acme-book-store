@@ -51,6 +51,12 @@
     "PublisherDeletionConfirmationMessage": "Are you sure to delete the publisher '{0}'?",
     "Address": "Address",
     "ContactPhone": "Contact Phone",
-    "NewPublisher": "New publisher"
+    "NewPublisher": "New publisher",
+    "Menu:Suppliers": "Suppliers",
+    "Suppliers": "Suppliers",
+    "SupplierDeletionConfirmationMessage": "Are you sure to delete the supplier '{0}'?",
+    "ContactInformation": "Contact Information",
+    "NewSupplier": "New supplier",
+    "MinimumOrderQuantity": "Minimum Order Quantity"
   }
 }

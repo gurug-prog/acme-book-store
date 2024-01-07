@@ -42,7 +42,14 @@ function configureRoutes(routes: RoutesService) {
         parentName: '::Menu:BookStore',
         layout: eLayoutType.application,
         requiredPolicy: 'BookStore.Publishers',
-      }      
+      },
+      {
+        path: '/suppliers',
+        name: '::Menu:Suppliers',
+        parentName: '::Menu:BookStore',
+        layout: eLayoutType.application,
+        requiredPolicy: 'BookStore.Suppliers',
+      },
     ]);
   };
 }
